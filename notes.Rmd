@@ -1,0 +1,18 @@
+---
+title: "Untitled"
+author: "Regina Lionheart"
+date: "2023-06-20"
+output: html_document
+---
+
+Summarize SMP reach by repeat categories (different categories can be collapsed into one,
+data can be summed)
+
+deliverables: 2 tables per watershed  36 total
+Happy medium with level of polish
+Appended to a word document, final export as pdf
+pdf would be best probably
+
+END OF THURSDAY AT THE VERY LATEST
+
+
