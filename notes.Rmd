@@ -1,10 +1,28 @@
 ---
-title: "Untitled"
-author: "Regina Lionheart"
-date: "2023-06-20"
-output: html_document
+title: "Penguins Report"
+author: "Shannon Pileggi"
+date: "`r Sys.Date()`"
+# output:
+#   pdf_document: 
+#     toc: true
+#     toc_depth: 2
+#     number_sections: false # true
+#     keep_tex: yes
+# latex_engine: pdflatex
+# classoption: landscape
+# header-includes:
+#   \usepackage{helvet}
+#   \renewcommand\familydefault{\sfdefault}
+# include-before:
+# - '`\newpage{}`{=latex}'
 ---
 
+<!-- \let\oldsection\section -->
+<!-- \renewcommand\section{\clearpage\oldsection} -->
+
+<!-- options(knitr.kable.NA = '')  -->
+
+## Some Notes
 
 Summarize SMP reach by repeat categories (different categories can be collapsed into one,
 data can be summed)
@@ -18,8 +36,12 @@ END OF THURSDAY AT THE VERY LATEST
 
 
 We can at least shorten the table titles. How about: "Change in Tree Canopy and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the first series of tables, and "Change in Impervious Cover and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the second. 
+
 ```{r import_packages}
 library(data.table)
+library(gtsummary)
+library(kableExtra)
+library(knitr)
 library(readxl)
 library(tidyverse)
 options(scipen = 999)
@@ -37,29 +59,88 @@ raw.data <- read_excel(files, .name_repair = "universal")
 
 ## Create the first table
 ```{r Table1}
-## Table 1: Summary of Change in Tree Canopy, X Watershed
-cleaned.data <- raw.data %>% 
-  filter(!str_detect(Row.Labels, "Grand")) %>%
-  separate_wider_delim(Row.Labels, names = c("Watershed", "Subreach"), delim = ",")
+source("R/create_table1.R")
+allen <- export.table[[1]]
 
-
-table1 <- cleaned.data %>%
-  select(Watershed, Subreach, Unit_Area = Sum.of.Area_Acre, Canopy_Cover2013 = Sum.of.CanopyAcre2013,
-         Canopy_Cover2019 = Sum.of.CanopyAcre2019, Permitted_Shoreline_Clearing = Sum.of.P_ClearingFootprint_Acre_12_22,
-         Permitted_Shoreline_Enhancement = Sum.of.P_MitigationRestoration_Acre_12_22, 
-         Permitted_DNR = Sum.of.ForestPracticesAcre_13_19) %>%
-  rowwise() %>%
-  mutate(Percent_Canopy2013 = (Canopy_Cover2013 / Unit_Area) * 100,
-         Percent_Canopy2019 = (Canopy_Cover2019 / Unit_Area) * 100) %>%
-  mutate(Canopy_Change_Acres = Canopy_Cover2019 - Canopy_Cover2013) %>%
-  mutate(Canopy_Change_Percent = Percent_Canopy2019 - Percent_Canopy2013) %>%
-  mutate(Unaccounted_Canopy_Change_Acres = 
-           (Canopy_Change_Acres - (Permitted_Shoreline_Clearing + Permitted_DNR))) %>%
-  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Acres / Canopy_Change_Acres)) %>%
-  select(Watershed, Subreach, Unit_Area, Canopy_Cover2013, Percent_Canopy2013, Canopy_Cover2019, Percent_Canopy2019,
-         Canopy_Change_Acres, Canopy_Change_Percent, Permitted_Shoreline_Clearing, Permitted_Shoreline_Enhancement,
-         Permitted_DNR, Unaccounted_Canopy_Change_Acres, Unaccounted_Canopy_Change_Percent) %>%
-  group_by(Watershed) %>%
-  group_split()
-names(table1) <- unique(cleaned.data$Watershed)
 ```
+
+
+```{r maketables}
+
+allen.table <- allen %>% 
+  knitr::kable(
+    caption = "Change in Tree Canopy and Supporting Metrics, Allen Watershed and Reaches",
+    format = "latex",
+    align = "l",
+    booktabs = TRUE,
+    longtable = FALSE,
+    linesep = "") %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header", "scale_down"),
+      stripe_color = "gray!15",
+      full_width = FALSE) %>%
+  row_spec(row = 0, background = "#048CBD")
+
+
+save_kable(allen.table, "my_latex_table.pdf", keep_tex = FALSE)
+```
+
+
+# ```{r}
+# source("R/kableExtraFunctions.R")
+# some_error_term_for_mtcars <- data.frame(sapply(1:ncol(allen), function(i) sample(x = (min(mtcars[, i])/10):max(mtcars[, i])/10, nrow(mtcars), replace = TRUE)))
+# 
+# two_tables_into_one <- as.data.frame(do.call(cbind, lapply(1:ncol(allen),
+#                                                            function(i) paste0(allen[ , i], " (", some_error_term_for_mtcars[ , i], ")"  ) )))
+# names(two_tables_into_one) <- names(mtcars)
+# head(two_tables_into_one)
+# 
+# 
+# knitr::kable(head(two_tables_into_one))
+# ```
+
+
+```{r}
+# source("R/kableExtraFunctions.R")
+# some_error_term_for_mtcars <- data.frame(sapply(1:ncol(mtcars), function(i) sample(x = (min(mtcars[, i])/10):max(mtcars[, i])/10, nrow(mtcars), replace = TRUE)))
+# 
+# two_tables_into_one <- as.data.frame(do.call(cbind, lapply(1:ncol(mtcars),
+#                                                            function(i) paste0(mtcars[ , i], " (", some_error_term_for_mtcars[ , i], ")"  ) )))
+# names(two_tables_into_one) <- names(mtcars)
+# head(two_tables_into_one)
+# 
+# 
+# knitr::kable(head(two_tables_into_one))
+# ```
+
+
+
+# ```{r anothertable}
+# allen %>% 
+#   gtsummary::tbl_summary(
+#   ) %>% 
+#   gtsummary::bold_labels() %>% 
+#   gtsummary::as_kable_extra(
+#     format = "latex",
+#     booktabs = TRUE,
+#     longtable = TRUE,
+#     linesep = ""
+#     ) %>%
+#   kableExtra::kable_styling(
+#       position = "left",
+#       latex_options = c("striped", "repeat_header"),
+#       stripe_color = "gray!15"
+#     )
+```
+
+
+
+```{r}
+# kable(allen, digits = 2, format = "html", row.names = TRUE) %>%
+#   kable_styling(bootstrap_options = c("striped", "hover"),
+#                 full_width = F,
+#                 font_size = 12,
+#                 position = "left") %>%
+#  row_spec(row = 0, color = "#048CBD")  # row = 0 allows us to format the header
+# ```
