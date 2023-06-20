@@ -5,6 +5,7 @@ date: "2023-06-20"
 output: html_document
 ---
 
+
 Summarize SMP reach by repeat categories (different categories can be collapsed into one,
 data can be summed)
 
@@ -16,3 +17,49 @@ pdf would be best probably
 END OF THURSDAY AT THE VERY LATEST
 
 
+We can at least shorten the table titles. How about: "Change in Tree Canopy and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the first series of tables, and "Change in Impervious Cover and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the second. 
+```{r import_packages}
+library(data.table)
+library(readxl)
+library(tidyverse)
+options(scipen = 999)
+```
+
+## Read in excel file 
+```{r read_data}
+## Import
+files <- list.files(pattern = "*.xlsx", path = "data_raw/", 
+                    recursive = TRUE, full.names = TRUE)
+
+raw.data <- read_excel(files, .name_repair = "universal")
+
+```
+
+## Create the first table
+```{r Table1}
+## Table 1: Summary of Change in Tree Canopy, X Watershed
+cleaned.data <- raw.data %>% 
+  filter(!str_detect(Row.Labels, "Grand")) %>%
+  separate_wider_delim(Row.Labels, names = c("Watershed", "Subreach"), delim = ",")
+
+
+table1 <- cleaned.data %>%
+  select(Watershed, Subreach, Unit_Area = Sum.of.Area_Acre, Canopy_Cover2013 = Sum.of.CanopyAcre2013,
+         Canopy_Cover2019 = Sum.of.CanopyAcre2019, Permitted_Shoreline_Clearing = Sum.of.P_ClearingFootprint_Acre_12_22,
+         Permitted_Shoreline_Enhancement = Sum.of.P_MitigationRestoration_Acre_12_22, 
+         Permitted_DNR = Sum.of.ForestPracticesAcre_13_19) %>%
+  rowwise() %>%
+  mutate(Percent_Canopy2013 = (Canopy_Cover2013 / Unit_Area) * 100,
+         Percent_Canopy2019 = (Canopy_Cover2019 / Unit_Area) * 100) %>%
+  mutate(Canopy_Change_Acres = Canopy_Cover2019 - Canopy_Cover2013) %>%
+  mutate(Canopy_Change_Percent = Percent_Canopy2019 - Percent_Canopy2013) %>%
+  mutate(Unaccounted_Canopy_Change_Acres = 
+           (Canopy_Change_Acres - (Permitted_Shoreline_Clearing + Permitted_DNR))) %>%
+  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Acres / Canopy_Change_Acres)) %>%
+  select(Watershed, Subreach, Unit_Area, Canopy_Cover2013, Percent_Canopy2013, Canopy_Cover2019, Percent_Canopy2019,
+         Canopy_Change_Acres, Canopy_Change_Percent, Permitted_Shoreline_Clearing, Permitted_Shoreline_Enhancement,
+         Permitted_DNR, Unaccounted_Canopy_Change_Acres, Unaccounted_Canopy_Change_Percent) %>%
+  group_by(Watershed) %>%
+  group_split()
+names(table1) <- unique(cleaned.data$Watershed)
+```
