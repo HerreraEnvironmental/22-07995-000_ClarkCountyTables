@@ -26,7 +26,7 @@ files <- list.files(pattern = "*.xlsx", path = "data_raw/",
 raw.data <- read_excel(files, .name_repair = "universal")
 ```
 
-## Create the first table
+## Create the table lists
 
 ```{r create_tables}
 source("R/create_tables.R")
@@ -35,7 +35,7 @@ source("R/create_tables.R")
 
 ```{r render_tables_function}
 
-RenderTables <- function(table.list, title) {
+RenderTables <- function(table.list, title, filename) {
   for (i in 1:length(table.list)) {
     print(kable(table.list[[i]],
                 caption = paste0(names(table.list[i]), 
@@ -51,7 +51,7 @@ RenderTables <- function(table.list, title) {
               stripe_color = "gray!15",
               full_width = FALSE) %>%
             row_spec(row = 0, background = "#048CBD") %>%
-            save_kable(., paste("figures/", names(table.list[i]), ".pdf"), keep_tex = FALSE)) 
+            save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf"), keep_tex = FALSE)) 
     cat("\n")
   }
 }
@@ -60,7 +60,11 @@ RenderTables <- function(table.list, title) {
 
 
 ```{r render_table2}
-RenderTables(export.table1, " Watershed and Reaches: Change in Tree Canopy and Supporting Metrics")
-RenderTables(export.table2, " Watershed and Reaches: Change in Impervious Cover and Supporting Metrics")
+RenderTables(export.table1, 
+             title = " Watershed and Reaches: Change in Tree Canopy and Supporting Metrics",
+             filename = "Canopy")
+RenderTables(export.table2,
+             title = " Watershed and Reaches: Change in Impervious Cover and Supporting Metrics",
+             filename = "Impervious")
 ```
 

@@ -10,6 +10,7 @@ paste_columns <- function(colA, colB) {
 cleaned.data <- raw.data %>% 
   filter(!str_detect(Row.Labels, "Grand")) %>%
   separate_wider_delim(Row.Labels, names = c("Watershed", "Subreach"), delim = ",")
+cleaned.data$Watershed <- gsub("/", " ", cleaned.data$Watershed) # Remove / character
 
 # Select and rename columns
 fixed.columns <- cleaned.data %>%
