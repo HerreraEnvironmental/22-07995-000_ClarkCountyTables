@@ -1,3 +1,10 @@
+## Pasting function
+paste_columns <- function(colA, colB) {
+  newcol <- paste(colA, " (", colB, "%)", sep = "")
+}
+
+
+# Begin table creation ----------------------------------------------------
 
 # Clean and tidy the imported data
 cleaned.data <- raw.data %>% 
@@ -31,11 +38,8 @@ table1 <- fixed.columns %>%
   mutate(across(where(is.numeric), round, digits = 2)) %>%
   mutate_all(~ifelse(is.nan(.), 0, .))
 
-paste_columns <- function(colA, colB) {
-  newcol <- paste(colA, " (", colB, "%)", sep = "")
-}
-
-final.columns <- table1 %>%
+## Select and rename columns
+final.columns1 <- table1 %>%
   mutate(Canopy_Total2013 = paste_columns(Canopy2013, Percent_Canopy2013),
          Canopy_Total2019 =  paste_columns(Canopy2019, Percent_Canopy2019),
          Canopy_Change_Total = paste_columns(Canopy_Change_Acres, Canopy_Change_Percent),
@@ -45,10 +49,10 @@ final.columns <- table1 %>%
          Unaccounted_Total = paste_columns(Other_Canopy_Change_Acres, Other_Canopy_Change_Percent)) %>%
   select(Watershed, Subreach, Area, contains("Total"))
   
-export.table <- final.columns %>%
+export.table1 <- final.columns1 %>%
   group_by(Watershed) %>%
   group_split()
-names(export.table) <- unique(cleaned.data$Watershed)
+names(export.table1) <- unique(cleaned.data$Watershed)
   
 
 # Table 2: Change in Impervious Cover and Supporting Metrics ------------------
