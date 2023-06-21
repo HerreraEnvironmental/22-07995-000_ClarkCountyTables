@@ -2,6 +2,7 @@
 editor_options: 
   markdown: 
     wrap: 72
+    output: html_document
 ---
 
 ------------------------------------------------------------------------
@@ -50,12 +51,32 @@ allen <- export.table[[1]]
 
 ```
 
-```{r maketables}
 
-allen.table <- allen %>% 
+```{r}
+export.table %>%
+  imap(~ save_kable(file = paste0("figures/", .y, "Canopy Metrics.png"),
+                    self_contained = TRUE, 
+                    x = knitr::kable(.x, 
+                      caption = paste0("Change in Tree Canopy and Supporting Metrics ",
+                                       .y, " Watershed and Reaches"), 
+                      align = "l",
+                      booktabs = TRUE,
+                      longtable = FALSE,
+                      linesep = "") %>%
+                      kable_styling(
+                        position = "left",
+                        latex_options = c("striped", "repeat_header", "scale_down"),
+                        stripe_color = "#048CBD",
+                        full_width = FALSE)))
+
+```
+
+
+```{r maketables}
+allen.table <- allen %>%
   knitr::kable(
-    caption = paste("Change in Tree Canopy and Supporting Metrics,", 
-                    names(export.table[1]), "Watershed and Reaches"), 
+    caption = paste("Change in Tree Canopy and Supporting Metrics,",
+                    names(export.table[1]), "Watershed and Reaches"),
     format = "latex",
     align = "l",
     booktabs = TRUE,
@@ -70,15 +91,6 @@ allen.table <- allen %>%
 
 
 save_kable(allen.table, "my_latex_table.pdf", keep_tex = FALSE)
-```
-
-```{r tables2}
-
- kable(export.table[[1]], caption = paste0("Frequency table for the '", colnames(export.table[[1]])[2], "' variable."))
-
-# lapply(names(individual.ROC), 
-#        function(x) ggsave(filename = paste("figures/ROC_plots/ROC_plot_", 
-#                                            x, ".png", sep = ""), plot = individual.ROC[[x]]))
 ```
 
 
