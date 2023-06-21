@@ -2,7 +2,7 @@
 editor_options: 
   markdown: 
     wrap: 72
-    output: html_document
+    output: pdf
 ---
 
 ------------------------------------------------------------------------
@@ -92,6 +92,27 @@ export.table2 %>%
 
 
 ```{r maketables}
+
+for (i in 1:length(export.table)){
+    print(kable(export.table[[i]],
+                    caption = paste("Change in Tree Canopy and Supporting Metrics, Watershed and Reaches"),
+    format = "latex",
+    align = "l",
+    booktabs = TRUE,
+    longtable = FALSE,
+    linesep = "") %>%
+        kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header", "scale_down"),
+      stripe_color = "gray!15",
+      full_width = FALSE) %>%
+        row_spec(row = 0, background = "#048CBD") %>%
+        save_kable(., paste("figures/", names(export.table[i]), ".pdf"), keep_tex = FALSE)
+) 
+    cat("\n")
+}
+
+
 allen.table <- allen %>%
   knitr::kable(
     caption = paste("Change in Tree Canopy and Supporting Metrics,",
@@ -106,10 +127,8 @@ allen.table <- allen %>%
       latex_options = c("striped", "repeat_header", "scale_down"),
       stripe_color = "gray!15",
       full_width = FALSE) %>%
-  row_spec(row = 0, background = "#048CBD")
-
-
-save_kable(allen.table, "figures/AllenCanyonCreek.pdf", keep_tex = FALSE)
+  row_spec(row = 0, background = "#048CBD") %>%
+  save_kable(., paste("figures/", names(export.table[1]), ".pdf"), keep_tex = FALSE)
 ```
 
 
