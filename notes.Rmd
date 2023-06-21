@@ -1,43 +1,29 @@
 ---
-title: "Penguins Report"
-author: "Shannon Pileggi"
-date: "`r Sys.Date()`"
-# output:
-#   pdf_document: 
-#     toc: true
-#     toc_depth: 2
-#     number_sections: false # true
-#     keep_tex: yes
-# latex_engine: pdflatex
-# classoption: landscape
-# header-includes:
-#   \usepackage{helvet}
-#   \renewcommand\familydefault{\sfdefault}
-# include-before:
-# - '`\newpage{}`{=latex}'
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
-<!-- \let\oldsection\section -->
-<!-- \renewcommand\section{\clearpage\oldsection} -->
-
-<!-- options(knitr.kable.NA = '')  -->
+------------------------------------------------------------------------
 
 ## Some Notes
 
-Summarize SMP reach by repeat categories (different categories can be collapsed into one,
-data can be summed)
+Summarize SMP reach by repeat categories (different categories can be
+collapsed into one, data can be summed)
 
-deliverables: 2 tables per watershed  36 total
-Happy medium with level of polish
-Appended to a word document, final export as pdf
-pdf would be best probably
+Our deliverables: 2 tables per watershed 36 total Happy medium with
+level of polish Appended to a word document, final export as pdf pdf
+would be best probably
 
 END OF THURSDAY AT THE VERY LATEST
 
+We can at least shorten the table titles. How about: "Change in Tree
+Canopy and Supporting Metrics, [Watershed_Name] Watershed and Reaches"
+for the first series of tables, and "Change in Impervious Cover and
+Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the
+second.
 
-We can at least shorten the table titles. How about: "Change in Tree Canopy and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the first series of tables, and "Change in Impervious Cover and Supporting Metrics, [Watershed_Name] Watershed and Reaches" for the second. 
-
-```{r import_packages}
+```{r import_packages, results='hide'}
 library(data.table)
 library(gtsummary)
 library(kableExtra)
@@ -47,29 +33,29 @@ library(tidyverse)
 options(scipen = 999)
 ```
 
-## Read in excel file 
+## Read in excel file
+
 ```{r read_data}
 ## Import
 files <- list.files(pattern = "*.xlsx", path = "data_raw/", 
                     recursive = TRUE, full.names = TRUE)
-
 raw.data <- read_excel(files, .name_repair = "universal")
-
 ```
 
 ## Create the first table
+
 ```{r Table1}
 source("R/create_table1.R")
 allen <- export.table[[1]]
 
 ```
 
-
 ```{r maketables}
 
 allen.table <- allen %>% 
   knitr::kable(
-    caption = "Change in Tree Canopy and Supporting Metrics, Allen Watershed and Reaches",
+    caption = paste("Change in Tree Canopy and Supporting Metrics,", 
+                    names(export.table[1]), "Watershed and Reaches"), 
     format = "latex",
     align = "l",
     booktabs = TRUE,
@@ -86,61 +72,13 @@ allen.table <- allen %>%
 save_kable(allen.table, "my_latex_table.pdf", keep_tex = FALSE)
 ```
 
+```{r tables2}
 
-# ```{r}
-# source("R/kableExtraFunctions.R")
-# some_error_term_for_mtcars <- data.frame(sapply(1:ncol(allen), function(i) sample(x = (min(mtcars[, i])/10):max(mtcars[, i])/10, nrow(mtcars), replace = TRUE)))
-# 
-# two_tables_into_one <- as.data.frame(do.call(cbind, lapply(1:ncol(allen),
-#                                                            function(i) paste0(allen[ , i], " (", some_error_term_for_mtcars[ , i], ")"  ) )))
-# names(two_tables_into_one) <- names(mtcars)
-# head(two_tables_into_one)
-# 
-# 
-# knitr::kable(head(two_tables_into_one))
-# ```
+ kable(export.table[[1]], caption = paste0("Frequency table for the '", colnames(export.table[[1]])[2], "' variable."))
 
-
-```{r}
-# source("R/kableExtraFunctions.R")
-# some_error_term_for_mtcars <- data.frame(sapply(1:ncol(mtcars), function(i) sample(x = (min(mtcars[, i])/10):max(mtcars[, i])/10, nrow(mtcars), replace = TRUE)))
-# 
-# two_tables_into_one <- as.data.frame(do.call(cbind, lapply(1:ncol(mtcars),
-#                                                            function(i) paste0(mtcars[ , i], " (", some_error_term_for_mtcars[ , i], ")"  ) )))
-# names(two_tables_into_one) <- names(mtcars)
-# head(two_tables_into_one)
-# 
-# 
-# knitr::kable(head(two_tables_into_one))
-# ```
-
-
-
-# ```{r anothertable}
-# allen %>% 
-#   gtsummary::tbl_summary(
-#   ) %>% 
-#   gtsummary::bold_labels() %>% 
-#   gtsummary::as_kable_extra(
-#     format = "latex",
-#     booktabs = TRUE,
-#     longtable = TRUE,
-#     linesep = ""
-#     ) %>%
-#   kableExtra::kable_styling(
-#       position = "left",
-#       latex_options = c("striped", "repeat_header"),
-#       stripe_color = "gray!15"
-#     )
+# lapply(names(individual.ROC), 
+#        function(x) ggsave(filename = paste("figures/ROC_plots/ROC_plot_", 
+#                                            x, ".png", sep = ""), plot = individual.ROC[[x]]))
 ```
 
 
-
-```{r}
-# kable(allen, digits = 2, format = "html", row.names = TRUE) %>%
-#   kable_styling(bootstrap_options = c("striped", "hover"),
-#                 full_width = F,
-#                 font_size = 12,
-#                 position = "left") %>%
-#  row_spec(row = 0, color = "#048CBD")  # row = 0 allows us to format the header
-# ```
