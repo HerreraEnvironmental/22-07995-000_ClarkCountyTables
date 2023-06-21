@@ -71,6 +71,25 @@ export.table %>%
 
 ```
 
+```{r}
+export.table2 %>%
+  imap(~ save_kable(file = paste0("figures/", .y, " Impervious Metrics.png"),
+                    self_contained = TRUE, 
+                    x = knitr::kable(.x, 
+                      caption = paste0("Change in Impervious Cover and Supporting Metrics ",
+                                       .y, " Watershed and Reaches"), 
+                      align = "l",
+                      booktabs = TRUE,
+                      longtable = FALSE,
+                      linesep = "") %>%
+                      kable_styling(
+                        position = "left",
+                        latex_options = c("striped", "repeat_header", "scale_down"),
+                        stripe_color = "#048CBD",
+                        full_width = FALSE)))
+
+```
+
 
 ```{r maketables}
 allen.table <- allen %>%
@@ -90,7 +109,7 @@ allen.table <- allen %>%
   row_spec(row = 0, background = "#048CBD")
 
 
-save_kable(allen.table, "my_latex_table.pdf", keep_tex = FALSE)
+save_kable(allen.table, "figures/AllenCanyonCreek.pdf", keep_tex = FALSE)
 ```
 
 
