@@ -3,6 +3,7 @@ paste_columns <- function(colA, colB) {
   newcol <- paste(colA, " (", colB, "%)", sep = "")
 }
 
+## Starting initial edits from Lauren
 
 # Begin table creation ----------------------------------------------------
 
