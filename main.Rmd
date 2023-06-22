@@ -1,10 +1,11 @@
 ---
-editor_options:
-  markdown:
-    wrap: 72
+title: "Clark County Tables"
+output: pdf_document
 header-includes:
     - \usepackage{caption}
 ---
+
+\captionsetup[table]{labelformat=empty}
 
 ```{r import_packages, include=FALSE}
 library(data.table)
@@ -70,7 +71,7 @@ RenderTable1 <- function(table.list, filename) {
             column_spec(1:10, width = "50cm") %>%
             add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
                    bold = TRUE, font_size = 225) %>%
-            save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf", sep = " "), 
+            save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf", sep = ""), 
                        keep_tex = FALSE)) 
     cat("\n")
   }

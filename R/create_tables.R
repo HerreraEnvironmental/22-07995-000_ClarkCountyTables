@@ -11,7 +11,6 @@ raw.data$Watershed <- gsub("/", " ", raw.data$Watershed) # Remove / character
 
 # Select and rename columns
 fixed.columns <- raw.data %>%
-  filter(str_detect(Watershed, "North")) %>%
   select(Watershed, Reach, 
          Area = Area_Acre, 
          Canopy2013 = CanopyAcre2013,
