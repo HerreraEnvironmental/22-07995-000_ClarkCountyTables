@@ -34,10 +34,9 @@ table1 <- fixed.columns %>%
   mutate(Canopy_Change_Acres = Canopy2019 - Canopy2013,
          Canopy_Change_Percent = Percent_Canopy2019 - Percent_Canopy2013) %>%
   mutate(P_NonMitigation_Percent = (P_NonMitigation/Canopy_Change_Acres * 100)) %>%
-  mutate(across(matches("Shoreline"), ~ ((.x / Canopy_Change_Acres) * 100),
-                .names = "{col}_Percent")) %>%
-  mutate(across(matches("DNR"), ~ ((.x / abs(Canopy_Change_Acres)) * 100),
-                .names = "{col}_Percent")) %>%
+  mutate(Shoreline_Cleared_Percent = (Shoreline_Cleared / Canopy_Change_Acres) * 100) %>%
+  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Canopy_Change_Acres) * 100) %>%
+  mutate(DNR_Cleared_Percent = (DNR_Cleared / abs(Canopy_Change_Acres)) * 100) %>%
   mutate(Unaccounted_Canopy_Change_Acres = ifelse(Canopy_Change_Acres < 0, 
            (abs(Canopy_Change_Acres) - (DNR_Cleared + Shoreline_Cleared)), 
            (Canopy_Change_Acres) - (DNR_Cleared + Shoreline_Cleared))) %>%
@@ -63,6 +62,7 @@ final.columns1 <- table1 %>%
          Change_in_Canopy_Cover_Not_Accounted = paste_columns(Unaccounted_Canopy_Change_Acres, Unaccounted_Canopy_Change_Percent)) %>%
   select(Watershed, Reach, Area, Canopy_Cover_2013_AcresPTotalUnit:Change_in_Canopy_Cover_Not_Accounted)
   
+## Export to final rendering step
 export.table1 <- final.columns1 %>%
   group_by(Watershed) %>%
   group_split()
@@ -93,6 +93,8 @@ table2 <- fixed.columns %>%
   mutate(across(where(is.numeric), round, digits = 1)) %>%
   mutate_all(~ifelse(is.nan(.), 0, .))
 
+
+## Select and rename columns
 final.columns2 <- table2 %>%
   mutate(Impervious_Cover_2013_Acres = paste_columns(Impervious2013, Percent_Impervious2013),
          Impervious_Cover_2019_Acres =  paste_columns(Impervious2019, Percent_Impervious2019),
@@ -104,7 +106,7 @@ final.columns2 <- table2 %>%
          Change_in_Impervious_Cover_Not_Accounted = paste_columns(Unaccounted_Impervious_Change_Acres, Unaccounted_Impervious_Change_Percent)) %>%
   select(Watershed, Reach, Area, Impervious_Cover_2013_Acres:Change_in_Impervious_Cover_Not_Accounted)
 
-
+## Export to final rendering step
 export.table2 <- final.columns2 %>%
   group_by(Watershed) %>%
   group_split()

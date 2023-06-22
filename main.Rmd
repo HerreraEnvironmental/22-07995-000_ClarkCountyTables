@@ -7,7 +7,7 @@ editor_options:
 
 ------------------------------------------------------------------------
 
-```{r import_packages, results='hide'}
+```{r import_packages, include=FALSE}
 library(data.table)
 library(gtsummary)
 library(kableExtra)
