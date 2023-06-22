@@ -9,6 +9,7 @@ header-includes:
 
 ```{r import_packages, include=FALSE}
 library(data.table)
+library(janitor)
 library(kableExtra)
 library(knitr)
 library(readxl)
