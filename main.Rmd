@@ -21,7 +21,7 @@ options(scipen = 999)
 
 ```{r read_data}
 ## Import
-files <- list.files(pattern = "*.xlsx", path = "data_raw/", 
+files <- list.files(pattern = "Revised2*", path = "data_raw/", 
                     recursive = TRUE, full.names = TRUE)
 raw.data <- read_excel(files, .name_repair = "universal")
 ```

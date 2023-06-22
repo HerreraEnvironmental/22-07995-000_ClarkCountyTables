@@ -1,0 +1,33 @@
+
+•	I had previously lumped several attributes into the “P_MitigationRestoration_Acre_12_22” column. The client would like us to break this out into two separate categories. 
+
+o	We will keep the “Shoreline_TotalEnhanced” column and add a “Shoreline_TotalRestoration” column.  This is to distinguish between restoration/enhancement that was required under permits (compensatory mitigation) and restoration/enhancement that occurred voluntarily. 
+
+o	I’ll work on getting you the revised raw data tables ASAP, and I’ll update column headers in the Word document template accordingly
+
+•	An unrelated comment/question: How hard would it be to format the tables to show the “Canopy_Change_Total” values in bold text if they show change exceeding 5%? This is not essential if it would be a big, time-consuming ask. 
+
+
+•	Calculation checks/revisions:
+o	Both
+	As noted above, we’ll be keeping the “Shoreline_TotalEnhanced” column for both tables and adding a “Shoreline_TotalRestoration” column
+	The % reported with each of these numbers should be the relative contribution of the restoration/enhancement action to the change in canopy or impervious cover in the region
+	Ex: if 3 acres impervious lost between 2013 and 2019, and 0.3 acres of Shoreline_TotalEnhanced action taken, the % reported should be (0.3/3= 10%)
+	All values and percentages should be reported to one decimal place
+
+o	Canopy
+	Shoreline_TotalCleared (percentage value is pulling the percentage value for “Canopy_Total2013”). This % should be the contribution of Shoreline_TotalCleared to the overall change in canopy
+	Ex: if 100 acres of canopy were lost between 2013 and 2019, and Shoreline_TotalCleared was 5, the reported % for Shoreline_TotalCleared should be 5%)
+	Can we return positive values for the % DNR_Total and Unnaccounted_Total acreage? 
+	Can you confirm where the percent reporting for Shoreline_TotalEnhanced is coming from? 
+	For the Unaccounted_Total column:
+	If the amount of clearing from Shoreline_TotalCleared and DNR_Total is greater than the Canopy_Change_Total, can we return a value of 0.0 (0.0%)? 
+	This will reflect that all change has been accounted for
+
+o	Impervious
+	Instead of the “Shoreline_TotalCleared” and “DNR_Total” columns in the impervious cover reporting tables, we should have columns reporting the area and % contribution to change in impervious cover from “P_OverWaterStructure” and “P_NewImperviousFootprint” 
+	For the Unaccounted_Total column:
+	If the amount of impervious change from P_OverWaterStructure and P_NewImperviousFootprint is greater than the Impervious_Change_Total, can we return a value of 0.0 (0.0%)? 
+	This will reflect that all change has been accounted for
+
+
