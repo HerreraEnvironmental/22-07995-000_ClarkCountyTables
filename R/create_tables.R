@@ -76,14 +76,14 @@ table2 <- fixed.columns %>%
   mutate(across(contains("Impervious"), ~ ((.x / Area) * 100), 
                 .names = "Percent_{col}")) %>%
   mutate(Impervious_Change_Acres = Impervious2019 - Impervious2013,
-         Impervious_Change_Percent = Percent_Impervious2013 - Percent_Impervious2019) %>%
+         Impervious_Change_Percent = Percent_Impervious2019 - Percent_Impervious2013) %>%
   mutate(P_ImperviousFootprint_Percent = (P_ImperviousFootprint / abs(Impervious_Change_Acres)) * 100) %>%
   mutate(P_OverWaterStructure_Percent = (P_OverWaterStructure / abs(Impervious_Change_Acres)) * 100) %>%
   mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / abs(Impervious_Change_Acres)) * 100) %>%
   mutate(P_NonMitigation_Percent = (P_NonMitigation / abs(Impervious_Change_Acres)) * 100) %>%
   mutate(Unaccounted_Impervious_Change_Acres = ifelse(Impervious_Change_Acres < 0, 
-                                                           (abs(Impervious_Change_Acres) - (P_OverWaterStructure)), 
-                                                           (Impervious_Change_Acres - P_OverWaterStructure))) %>%
+                                                           (abs(Impervious_Change_Acres) - (P_ImperviousFootprint - P_OverWaterStructure)), 
+                                                           (Impervious_Change_Acres - (P_OverWaterStructure + P_ImperviousFootprint)))) %>%
   mutate(Unaccounted_Impervious_Change_Acres =
                     ifelse(Unaccounted_Impervious_Change_Acres < 0, 
                            0, Unaccounted_Impervious_Change_Acres)) %>%

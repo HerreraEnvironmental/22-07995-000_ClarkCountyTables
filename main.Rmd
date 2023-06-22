@@ -1,15 +1,13 @@
 ---
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
-    output: pdf
+header-includes:
+    - \usepackage{caption}
 ---
-
-------------------------------------------------------------------------
 
 ```{r import_packages, include=FALSE}
 library(data.table)
-library(gtsummary)
 library(kableExtra)
 library(knitr)
 library(readxl)
@@ -30,16 +28,25 @@ raw.data <- read_excel(files, .name_repair = "universal")
 
 ```{r create_tables}
 source("R/create_tables.R")
+
 ```
+
+```{r}
+names_spaced <- c(linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
+                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
+                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
+                            "Value\n(Number)"), align = "c"))
+```
+
 
 
 ```{r render_tables_function}
 
-RenderTables <- function(table.list, title, filename) {
+RenderTables <- function(table.list, filename) {
   for (i in 1:length(table.list)) {
     print(kable(table.list[[i]],
-                caption = paste0(names(table.list[i]), 
-                                 title, sep = " "),
+                caption = paste0(names(table.list[i]),
+                                 " Watershed and Reaches", sep = " "),
                 format = "latex",
                 align = "l",
                 booktabs = TRUE,
@@ -47,25 +54,58 @@ RenderTables <- function(table.list, title, filename) {
                 linesep = "") %>%
             kableExtra::kable_styling(
               position = "left",
-              latex_options = c("striped", "repeat_header", "scale_down"),
+              latex_options = c("striped", "scale_down"),
               stripe_color = "gray!15",
               full_width = FALSE,
-              font_size = 20) %>%
-            row_spec(row = 0, background = "#048CBD") %>%
-            save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf"), keep_tex = FALSE)) 
+              font_size = 160) %>%
+            row_spec(row = 0, background = "#048CBD", color = "white") %>%
+            column_spec(1:10, width = "50cm") %>%
+            add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
+                   bold = TRUE, font_size = 225) %>%
+            save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf", sep = " "), 
+                       keep_tex = FALSE)) 
     cat("\n")
   }
 }
 
 ```
 
-
+\captionsetup[table]{labelformat=empty}
 ```{r render_table2}
+export.table1 <- lapply(export.table1, function(x) { x["Watershed"] <- NULL; x })
+export.table2 <- lapply(export.table2, function(x) { x["Watershed"] <- NULL; x })
+
+
 RenderTables(export.table1, 
-             title = " Watershed and Reaches: Change in Tree Canopy and Supporting Metrics",
              filename = "Canopy")
 RenderTables(export.table2,
-             title = " Watershed and Reaches: Change in Impervious Cover and Supporting Metrics",
              filename = "Impervious")
 ```
 
+```{r}
+
+t <- export.table1[[1]]
+t.table <- t %>%
+  knitr::kable(
+    caption = paste(names(export.table1[1]), "Watershed and Reaches", sep = " "),
+    format = "latex",
+    align = "l",
+    booktabs = TRUE,
+    longtable = FALSE,
+    linesep = "",
+    col.names = linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
+                            "Canopy Cover 2019 (Acres, % of unit cover)", "Value\n(Number)", "Value\n(Number)",
+                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
+                            "Value\n(Number)"), align = "c")) %>%
+  add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
+                   bold = TRUE) %>%
+  kableExtra::kable_styling(
+      position = "left",
+      latex_options = c("striped", "repeat_header", "scale_down"),
+      stripe_color = "gray!15",
+      full_width = FALSE) %>%
+  row_spec(row = 0, background = "#048CBD", color = "white") %>%
+  column_spec(1:10, width = "2cm")
+save_kable(t.table, "figures/TEST.pdf", keep_tex = FALSE)
+
+```
