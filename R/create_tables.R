@@ -77,13 +77,19 @@ table2 <- fixed.columns %>%
                 .names = "Percent_{col}")) %>%
   mutate(Impervious_Change_Acres = Impervious2019 - Impervious2013,
          Impervious_Change_Percent = Percent_Impervious2013 - Percent_Impervious2019) %>%
-  
-  
-  mutate(across(matches("Shoreline|DNR"), ~ ((.x / Impervious_Change_Acres) * 100),
-                .names = "{col}_Percent")) %>%
-  mutate(Other_Impervious_Change_Acres = 
-           (Impervious_Change_Acres - (Shoreline_Cleared + DNR_Cleared))) %>%
-  mutate(Other_Impervious_Change_Percent = (Other_Impervious_Change_Acres / Impervious_Change_Acres)) %>%
+  mutate(P_ImperviousFootprint_Percent = (P_ImperviousFootprint / abs(Impervious_Change_Acres)) * 100) %>%
+  mutate(P_OverWaterStructure_Percent = (P_OverWaterStructure / abs(Impervious_Change_Acres)) * 100) %>%
+  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / abs(Impervious_Change_Acres)) * 100) %>%
+  mutate(P_NonMitigation_Percent = (P_NonMitigation / abs(Impervious_Change_Acres)) * 100) %>%
+  mutate(Unaccounted_Impervious_Change_Acres = ifelse(Impervious_Change_Acres < 0, 
+                                                           (abs(Impervious_Change_Acres) - (P_OverWaterStructure)), 
+                                                           (Impervious_Change_Acres - P_OverWaterStructure))) %>%
+  mutate(Unaccounted_Impervious_Change_Acres =
+                    ifelse(Unaccounted_Impervious_Change_Acres < 0, 
+                           0, Unaccounted_Impervious_Change_Acres)) %>%
+  mutate(Unaccounted_Impervious_Change_Percent = (Unaccounted_Impervious_Change_Acres / abs(Impervious_Change_Acres))) %>%
+  mutate(Unaccounted_Impervious_Change_Percent = ifelse(Unaccounted_Impervious_Change_Percent < 0, 
+                                                             0, Unaccounted_Impervious_Change_Percent)) %>%
   mutate(across(where(is.numeric), round, digits = 1)) %>%
   mutate_all(~ifelse(is.nan(.), 0, .))
 
@@ -91,19 +97,18 @@ final.columns2 <- table2 %>%
   mutate(Impervious_Cover_2013_Acres = paste_columns(Impervious2013, Percent_Impervious2013),
          Impervious_Cover_2019_Acres =  paste_columns(Impervious2019, Percent_Impervious2019),
          Change_in_Impervious_Cover2013_2019 = paste_columns(Impervious_Change_Acres, Impervious_Change_Percent),
-         Permitted_Impervious_Surface_in_SMA_Acres = paste_columns(P_ImperviousFootprint, ) 
-         
-         
-         Shoreline_TotalCleared = paste_columns(Shoreline_Cleared, Percent_Impervious2013),
-         Shoreline_TotalEnhanced = paste_columns(Shoreline_Enhanced, Shoreline_Enhanced_Percent),
-         DNR_Total = paste_columns(DNR_Cleared, DNR_Cleared_Percent),
-         Unaccounted_Total = paste_columns(Other_Impervious_Change_Acres, Other_Impervious_Change_Percent)) %>%
-  select(Watershed, Reach, Area, contains("Total"))
+         Permitted_Impervious_Surface_in_SMA_Acres = paste_columns(P_ImperviousFootprint, P_ImperviousFootprint_Percent),
+         Permitted_Overwater_Structures_in_SMA = paste_columns(P_OverWaterStructure, P_OverWaterStructure_Percent),
+         Permitted_Shoreline_Compensatory_Mitigation = paste_columns(Shoreline_Enhanced, Shoreline_Enhanced_Percent),
+         Permitted_Shoreline_Restoration = paste_columns(P_NonMitigation, P_NonMitigation_Percent),
+         Change_in_Impervious_Cover_Not_Accounted = paste_columns(Unaccounted_Impervious_Change_Acres, Unaccounted_Impervious_Change_Percent)) %>%
+  select(Watershed, Reach, Area, Impervious_Cover_2013_Acres:Change_in_Impervious_Cover_Not_Accounted)
+
 
 export.table2 <- final.columns2 %>%
   group_by(Watershed) %>%
   group_split()
-names(export.table2) <- unique(cleaned.data$Watershed)
+names(export.table2) <- unique(final.columns2$Watershed)
 
 
 
