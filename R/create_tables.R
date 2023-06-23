@@ -11,6 +11,7 @@ raw.data$Watershed <- gsub("/", " ", raw.data$Watershed) # Remove / character
 
 # Select and rename columns
 fixed.columns <- raw.data %>%
+  filter(str_detect(Watershed, "North")) %>%
   select(Watershed, Reach, 
          Area = Area_Acre, 
          Canopy2013 = CanopyAcre2013,
@@ -66,13 +67,23 @@ names(watershed.totals1) <- unique(table1$Watershed)
 
 bound.watershed.totals1 <- bind_rows(watershed.totals1, .id = "Watershed") %>%
   filter(!str_detect(Watershed, "Grand")) %>%
-  mutate(Reach = "Non-SMA Totals")
+  mutate(Reach = "SMA Totals") %>%
+  group_by(Watershed) %>%
+  mutate(Percent_Canopy2013 = (Canopy2013 / Area) * 100) %>%
+  mutate(Percent_Canopy2019 = (Canopy2019 / Area) * 100) %>%
+  mutate(Shoreline_Cleared_Percent = (Shoreline_Cleared / Canopy_Change_Acres) * 100) %>%
+  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Canopy_Change_Acres) * 100) %>%
+  mutate(P_NonMitigation_Percent = (P_NonMitigation / Canopy_Change_Acres) * 100) %>%
+  mutate(DNR_Cleared_Percent = (DNR_Cleared / Canopy_Change_Acres) * 100) %>%
+  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Percent / Canopy_Change_Acres) * 100) %>%
+  mutate(across(where(is.numeric), round, digits = 1))
+  
 
-final <- table1 %>%
-  rbind(bound.watershed.totals1)
+final1 <- table1 %>%
+  rbind(bound.watershed.totals1) 
 
 ## Select and rename columns
-final.columns1 <- final %>%
+final.columns1 <- final1 %>%
   select(Watershed, Reach, everything()) %>%
   mutate(Canopy_Cover_2013_AcresPTotalUnit = paste_columns(Canopy2013, Percent_Canopy2013),
          Canopy_Cover_2019_AcresPTotalUnit =  paste_columns(Canopy2019, Percent_Canopy2019),
@@ -132,10 +143,21 @@ names(watershed.totals2) <- unique(table2$Watershed)
 
 bound.watershed.totals2 <- bind_rows(watershed.totals2, .id = "Watershed") %>%
   filter(!str_detect(Watershed, "Grand")) %>%
-  mutate(Reach = "Non-SMA Totals")
+  mutate(Reach = "SMA Totals")  %>%
+  group_by(Watershed) %>%
+  mutate(Percent_Impervious2013 = (Impervious2013 / Area) * 100) %>%
+  mutate(Percent_Impervious2019 = (Impervious2019 / Area) * 100) %>%
+  mutate((P_ImperviousFootprint / Impervious_Change_Acres)* 100 ) %>%
+  
+  mutate(Shoreline_Cleared_Percent = (Shoreline_Cleared / Canopy_Change_Acres) * 100) %>%
+  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Canopy_Change_Acres) * 100) %>%
+  mutate(P_NonMitigation_Percent = (P_NonMitigation / Canopy_Change_Acres) * 100) %>%
+  mutate(DNR_Cleared_Percent = (DNR_Cleared / Canopy_Change_Acres) * 100) %>%
+  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Percent / Canopy_Change_Acres) * 100) %>%
+  mutate(across(where(is.numeric), round, digits = 1))
 
 final2 <- table2 %>%
-  rbind(bound.watershed.totals2)
+  rbind(bound.watershed.totals2) 
 
 
 ## Select and rename columns
