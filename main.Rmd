@@ -1,5 +1,5 @@
 ---
-title: "Suppress automatic table name and number"
+title: "22-07995-000_ClarkCountyTables"
 output: pdf_document
 header-includes:
     - \usepackage{caption}
