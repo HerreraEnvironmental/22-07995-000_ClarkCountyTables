@@ -1,11 +1,14 @@
 ---
-title: "Clark County Tables"
+title: "Suppress automatic table name and number"
 output: pdf_document
 header-includes:
     - \usepackage{caption}
 ---
 
 \captionsetup[table]{labelformat=empty}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ```{r import_packages, include=FALSE}
 library(data.table)
@@ -34,14 +37,15 @@ source("R/create_tables.R")
 ```
 
 
-
 ```{r render_table1}
 
 RenderTable1 <- function(table.list, filename) {
   for (i in 1:length(table.list)) {
+        header = 10
+    names(header) = paste0("Change in Tree Canopy and Supporting Metrics ",
+                           names(table.list[i]), " Watershed and Reaches", sep = " ")
+    
     print(kable(table.list[[i]],
-                caption = paste0(names(table.list[i]),
-                                 " Watershed and Reaches", sep = " "),
                 format = "latex",
                 align = "l",
                 booktabs = TRUE,
@@ -53,7 +57,7 @@ RenderTable1 <- function(table.list, filename) {
                             "Permitted shoreline clearing in SMA, 2012-2022 (Acres)",
                             "Permitted shoreline compensatory mitigation 2012-2022 (Acres, % of change)",
                             "Permitted shoreline restoration 2019-2022 (Acres, % of change)", 
-                            "Permitted clearing from DNR forestry permits, 2013-2021 (Acres)",
+                            "Permitted clearing from DNR forestry permits, 2013-2021 (Acres, % of change)",
                             "Change in canopy cover not accounted for by issued SMA permits and/or DNR clearing (Acres, % of change)"), align = "c")) %>%
             kableExtra::kable_styling(
               position = "left",
@@ -63,8 +67,7 @@ RenderTable1 <- function(table.list, filename) {
               font_size = 160) %>%
             row_spec(row = 0, background = "#048CBD", color = "white") %>%
             column_spec(1:10, width = "50cm") %>%
-            add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
-                   bold = TRUE, font_size = 225) %>%
+            add_header_above(header = header, bold = TRUE, font_size = 250) %>%
             save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf", sep = ""), 
                        keep_tex = FALSE)) 
     cat("\n")
@@ -76,11 +79,12 @@ RenderTable1 <- function(table.list, filename) {
 
 ```{r render_tables_function}
 
-RenderTable2 <- function(table.list, filename) {
+RenderTable2 <- function(table.list, header, filename) {
   for (i in 1:length(table.list)) {
+    header = 10
+    names(header) = paste0("Change in Impervious Surface Cover and Supporting Metrics ", names(table.list[i]), " Watershed and Reaches", sep = " ")
+    
     print(kable(table.list[[i]],
-                caption = paste0(names(table.list[i]),
-                                 " Watershed and Reaches", sep = " "),
                 format = "latex",
                 align = "l",
                 booktabs = TRUE,
@@ -102,8 +106,7 @@ RenderTable2 <- function(table.list, filename) {
               font_size = 160) %>%
             row_spec(row = 0, background = "#048CBD", color = "white") %>%
             column_spec(1:10, width = "50cm") %>%
-            add_header_above(c("Change in Impervious Surface Cover and Supporting Metrics" = 10),
-                   bold = TRUE, font_size = 225) %>%
+            add_header_above(header = header, bold = TRUE, font_size = 250) %>%
             save_kable(., paste("figures/", names(table.list[i]), filename, ".pdf", sep = ""), 
                        keep_tex = FALSE)) 
     cat("\n")
@@ -113,11 +116,15 @@ RenderTable2 <- function(table.list, filename) {
 ```
 
 
-\captionsetup[table]{labelformat=empty}
+
+
 ```{r render_table2}
 export.table1 <- lapply(export.table1, function(x) { x["Watershed"] <- NULL; x })
 export.table2 <- lapply(export.table2, function(x) { x["Watershed"] <- NULL; x })
+```
 
+
+```{r}
 
 RenderTable1(export.table1, 
              filename = "Canopy")
@@ -127,28 +134,28 @@ RenderTable2(export.table2,
 
 ```{r}
 
-t <- export.table1[[1]]
-t.table <- t %>%
-  knitr::kable(
-    caption = paste(names(export.table1[1]), "Watershed and Reaches", sep = " "),
-    format = "latex",
-    align = "l",
-    booktabs = TRUE,
-    longtable = FALSE,
-    linesep = "",
-    col.names = linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
-                            "Canopy Cover 2019 (Acres, % of unit cover)", "Value\n(Number)", "Value\n(Number)",
-                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
-                            "Value\n(Number)"), align = "c")) %>%
-  add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
-                   bold = TRUE) %>%
-  kableExtra::kable_styling(
-      position = "left",
-      latex_options = c("striped", "repeat_header", "scale_down"),
-      stripe_color = "gray!15",
-      full_width = FALSE) %>%
-  row_spec(row = 0, background = "#048CBD", color = "white") %>%
-  column_spec(1:10, width = "2cm")
-save_kable(t.table, "figures/TEST.pdf", keep_tex = FALSE)
+# t <- export.table1[[1]]
+# t.table <- t %>%
+#   knitr::kable(
+#     caption = paste(names(export.table1[1]), "Watershed and Reaches", sep = " "),
+#     format = "latex",
+#     align = "l",
+#     booktabs = TRUE,
+#     longtable = FALSE,
+#     linesep = "",
+#     col.names = linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
+#                             "Canopy Cover 2019 (Acres, % of unit cover)", "Value\n(Number)", "Value\n(Number)",
+#                             "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
+#                             "Value\n(Number)"), align = "c")) %>%
+#   add_header_above(c("Change in Tree Canopy and Supporting Metrics" = 10),
+#                    bold = TRUE) %>%
+#   kableExtra::kable_styling(
+#       position = "left",
+#       latex_options = c("striped", "repeat_header", "scale_down"),
+#       stripe_color = "gray!15",
+#       full_width = FALSE) %>%
+#   row_spec(row = 0, background = "#048CBD", color = "white") %>%
+#   column_spec(1:10, width = "2cm")
+# save_kable(t.table, "figures/TEST.pdf", keep_tex = FALSE)
 
 ```
