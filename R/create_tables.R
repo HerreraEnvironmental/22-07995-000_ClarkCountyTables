@@ -50,29 +50,30 @@ table1 <- fixed.columns %>%
   mutate_all(~ifelse(is.nan(.), 0, .))
 
 ## Create non-SMA totals
-watershed.split <- table1 %>%
+watershed.split1 <- table1 %>%
   group_by(Watershed) %>%
   group_split() 
-names(watershed.split) <- unique(table1$Watershed)
+names(watershed.split1) <- unique(table1$Watershed)
 
-watershed.totals <- map(watershed.split, ~ colSums(.x[!str_detect(.x$Reach, "Non-SMA"), -c(1:2)]) %>%
+watershed.totals1 <- map(watershed.split1, ~ colSums(.x[!str_detect(.x$Reach, "Non-SMA"), -c(1:2)]) %>%
                           as.data.frame() %>%
                           rownames_to_column() %>%
                           pivot_wider(names_from = 1, values_from = 2) %>%
                           mutate(Watershed = "Total for Non-SMA Areas in Watershed:",
                                  Reach = NA) %>%
                           select(Watershed, Reach, everything()))
-names(watershed.totals) <- unique(table1$Watershed)
+names(watershed.totals1) <- unique(table1$Watershed)
 
-bound.watershed.totals <- bind_rows(watershed.totals, .id = "Watershed") %>%
+bound.watershed.totals1 <- bind_rows(watershed.totals1, .id = "Watershed") %>%
   filter(!str_detect(Watershed, "Grand")) %>%
   mutate(Reach = "Non-SMA Totals")
 
 final <- table1 %>%
-  rbind(bound.watershed.totals)
+  rbind(bound.watershed.totals1)
 
 ## Select and rename columns
-final.columns1 <- table1 %>%
+final.columns1 <- final %>%
+  select(Watershed, Reach, everything()) %>%
   mutate(Canopy_Cover_2013_AcresPTotalUnit = paste_columns(Canopy2013, Percent_Canopy2013),
          Canopy_Cover_2019_AcresPTotalUnit =  paste_columns(Canopy2019, Percent_Canopy2019),
          Change_in_Canopy_Cover2013_2019 = paste_columns(Canopy_Change_Acres, Canopy_Change_Percent),
@@ -114,9 +115,32 @@ table2 <- fixed.columns %>%
   mutate(across(where(is.numeric), round, digits = 1)) %>%
   mutate_all(~ifelse(is.nan(.), 0, .))
 
+## Create non-SMA totals
+watershed.split2 <- table2 %>%
+  group_by(Watershed) %>%
+  group_split() 
+names(watershed.split2) <- unique(table2$Watershed)
+
+watershed.totals2 <- map(watershed.split2, ~ colSums(.x[!str_detect(.x$Reach, "Non-SMA"), -c(1:2)]) %>%
+                          as.data.frame() %>%
+                          rownames_to_column() %>%
+                          pivot_wider(names_from = 1, values_from = 2) %>%
+                          mutate(Watershed = "Total for Non-SMA Areas in Watershed:",
+                                 Reach = NA) %>%
+                          select(Watershed, Reach, everything()))
+names(watershed.totals2) <- unique(table2$Watershed)
+
+bound.watershed.totals2 <- bind_rows(watershed.totals2, .id = "Watershed") %>%
+  filter(!str_detect(Watershed, "Grand")) %>%
+  mutate(Reach = "Non-SMA Totals")
+
+final2 <- table2 %>%
+  rbind(bound.watershed.totals2)
+
 
 ## Select and rename columns
-final.columns2 <- table2 %>%
+final.columns2 <- final2 %>%
+  select(Watershed, Reach, everything()) %>%
   mutate(Impervious_Cover_2013_Acres = paste_columns(Impervious2013, Percent_Impervious2013),
          Impervious_Cover_2019_Acres =  paste_columns(Impervious2019, Percent_Impervious2019),
          Change_in_Impervious_Cover2013_2019 = paste_columns(Impervious_Change_Acres, Impervious_Change_Percent),

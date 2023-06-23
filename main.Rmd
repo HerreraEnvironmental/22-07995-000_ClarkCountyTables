@@ -33,13 +33,6 @@ source("R/create_tables.R")
 
 ```
 
-```{r}
-names_spaced <- c(linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
-                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
-                            "Value\n(Number)", "Value\n(Number)", "Value\n(Number)",
-                            "Value\n(Number)"), align = "c"))
-```
-
 
 
 ```{r render_table1}
