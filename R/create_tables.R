@@ -75,7 +75,7 @@ bound.watershed.totals1 <- bind_rows(watershed.totals1, .id = "Watershed") %>%
   mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Canopy_Change_Acres) * 100) %>%
   mutate(P_NonMitigation_Percent = (P_NonMitigation / Canopy_Change_Acres) * 100) %>%
   mutate(DNR_Cleared_Percent = (DNR_Cleared / Canopy_Change_Acres) * 100) %>%
-  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Percent / Canopy_Change_Acres) * 100) %>%
+  mutate(Unaccounted_Canopy_Change_Percent = Percent_Canopy2019 - Percent_Canopy2013) %>%
   mutate(across(where(is.numeric), round, digits = 1))
   
 
@@ -147,13 +147,11 @@ bound.watershed.totals2 <- bind_rows(watershed.totals2, .id = "Watershed") %>%
   group_by(Watershed) %>%
   mutate(Percent_Impervious2013 = (Impervious2013 / Area) * 100) %>%
   mutate(Percent_Impervious2019 = (Impervious2019 / Area) * 100) %>%
-  mutate((P_ImperviousFootprint / Impervious_Change_Acres)* 100 ) %>%
-  
-  mutate(Shoreline_Cleared_Percent = (Shoreline_Cleared / Canopy_Change_Acres) * 100) %>%
-  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Canopy_Change_Acres) * 100) %>%
-  mutate(P_NonMitigation_Percent = (P_NonMitigation / Canopy_Change_Acres) * 100) %>%
-  mutate(DNR_Cleared_Percent = (DNR_Cleared / Canopy_Change_Acres) * 100) %>%
-  mutate(Unaccounted_Canopy_Change_Percent = (Unaccounted_Canopy_Change_Percent / Canopy_Change_Acres) * 100) %>%
+  mutate(P_ImperviousFootprint_Percent = (P_ImperviousFootprint / Impervious_Change_Acres) * 100) %>%
+  mutate(P_OverWaterStructure_Percent = (P_OverWaterStructure / Impervious_Change_Acres) * 100) %>%
+  mutate(Shoreline_Enhanced_Percent = (Shoreline_Enhanced / Impervious_Change_Acres) * 100) %>%
+  mutate(P_NonMitigation_Percent = (P_NonMitigation / Impervious_Change_Acres) * 100) %>%
+  mutate(Unaccounted_Impervious_Change_Percent =  Percent_Impervious2019 - Percent_Impervious2013) %>%
   mutate(across(where(is.numeric), round, digits = 1))
 
 final2 <- table2 %>%
