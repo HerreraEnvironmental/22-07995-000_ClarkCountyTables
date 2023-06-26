@@ -24,7 +24,7 @@ options(scipen = 999)
 
 ```{r read_data}
 ## Import
-files <- list.files(pattern = "Revised2*", path = "data_raw/", 
+files <- list.files(pattern = "20230623", path = "data_raw/", 
                     recursive = TRUE, full.names = TRUE)
 raw.data <- read_excel(files, .name_repair = "universal")
 ```
@@ -54,7 +54,7 @@ RenderTable1 <- function(table.list, filename) {
                 col.names = linebreak(c("Reach", "Area", "Canopy Cover 2013 (Acres, % of unit cover)",
                             "Canopy Cover 2019 (Acres, % of unit cover)", 
                             "Change in canopy cover, 2013-2019 (Acres, % of unit cover) ",
-                            "Permitted shoreline clearing in SMA, 2012-2022 (Acres)",
+                            "Permitted shoreline clearing in SMA, 2012-2022 (Acres, % of change)",
                             "Permitted shoreline compensatory mitigation 2012-2022 (Acres, % of change)",
                             "Permitted shoreline restoration 2012-2022 (Acres, % of change)", 
                             "Permitted clearing from DNR forestry permits, 2013-2021 (Acres, % of change)",
@@ -93,8 +93,8 @@ RenderTable2 <- function(table.list, header, filename) {
                 col.names = linebreak(c("Reach", "Area", "Impervious Cover 2013 (Acres, % of total unit)",
                             "Impervious Cover 2019 (Acres, % of total unit)", 
                             "Change in Impervious cover, 2013-2019 (Acres, % of unit cover)",
-                            "Permitted impervious surface in SMA, 2012-2022 (Acres, % of total unit)",
-                            "Permitted over-water structures in SMA, 2012-2022 (Acres, % of total unit) ",
+                            "Permitted Impervious surface in SMA, 2012-2022 (Acres, % of change)",
+                            "Permitted over-water structures in SMA, 2012-2022 (Acres, % of change) ",
                             "Permitted shoreline compensatory mitigation 2012-2022 (Acres, % of change)", 
                             "Permitted shoreline restoration 2012-2022 (Acres, % of change)",
                             "Change in impervious cover not accounted for by issued SMA permits (Acres, % of change)"), align = "c")) %>%
