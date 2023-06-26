@@ -26,7 +26,8 @@ options(scipen = 999)
 ## Import
 files <- list.files(pattern = "20230623", path = "data_raw/", 
                     recursive = TRUE, full.names = TRUE)
-raw.data <- read_excel(files, .name_repair = "universal")
+raw.data <- read_excel(files, .name_repair = "universal") %>%
+  arrange(Watershed, Reach)
 ```
 
 ## Create the table lists

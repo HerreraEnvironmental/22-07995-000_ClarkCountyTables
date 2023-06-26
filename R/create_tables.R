@@ -11,6 +11,7 @@ raw.data$Watershed <- gsub("/", " ", raw.data$Watershed) # Remove / character
 
 # Select and rename columns
 fixed.columns <- raw.data %>%
+  #filter(str_detect(Watershed, "East Fork")) %>%
   select(Watershed, Reach, 
          Area = Area_Acre, 
          Canopy2013 = CanopyAcre2013,
@@ -22,7 +23,8 @@ fixed.columns <- raw.data %>%
          P_NonMitigation = P_NonMitigationRestoration_SqFT_19_22,
          DNR_Cleared = ForestPracticesAcre_13_19,
          P_OverWaterStructure = P_OverWaterStructure_Acre_12_22,
-         P_ImperviousFootprint = P_NewImperviousFootprint_Acre_12_22)
+         P_ImperviousFootprint = P_NewImperviousFootprint_Acre_12_22) %>%
+  arrange(Watershed, Reach)
 
 
 # Table 1: Summary of Change in Tree Canopy, X Watershed ------------------
@@ -52,6 +54,7 @@ table1 <- fixed.columns %>%
 ## Create non-SMA totals
 watershed.split1 <- table1 %>%
   group_by(Watershed) %>%
+  arrange(Watershed, Reach) %>%
   group_split() 
 names(watershed.split1) <- unique(table1$Watershed)
 
@@ -94,9 +97,12 @@ final.columns1 <- final1 %>%
          Permitted_Clearing_from_DNR_Forestry2013_2021 = paste_columns(DNR_Cleared, DNR_Cleared_Percent),
          Change_in_Canopy_Cover_Not_Accounted = paste_columns(Unaccounted_Canopy_Change_Acres, Unaccounted_Canopy_Change_Percent)) %>%
   select(Watershed, Reach, Area, Canopy_Cover_2013_AcresPTotalUnit:Change_in_Canopy_Cover_Not_Accounted)
-  
+
+
+
 ## Export to final rendering step
 export.table1 <- final.columns1 %>%
+  arrange(Watershed, Reach) %>%
   group_by(Watershed) %>%
   group_split()
 names(export.table1) <- unique(final.columns1$Watershed)
@@ -124,7 +130,8 @@ table2 <- fixed.columns %>%
   mutate(Unaccounted_Impervious_Change_Percent = ifelse(Unaccounted_Impervious_Change_Percent < 0, 
                                                              0, Unaccounted_Impervious_Change_Percent)) %>%
   mutate(across(where(is.numeric), round, digits = 1)) %>%
-  mutate_all(~ifelse(is.nan(.), 0, .))
+  mutate_all(~ifelse(is.nan(.), 0, .)) %>%
+  arrange(Watershed, Reach)
 
 ## Create non-SMA totals
 watershed.split2 <- table2 %>%
